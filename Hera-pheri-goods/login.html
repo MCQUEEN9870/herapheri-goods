@@ -70,6 +70,44 @@
                     <div class="debug-info" id="loginDebugInfo"></div>
                 </form>
                 <p class="auth-switch">New to Herapheri Goods? <a href="#" id="showSignup">Sign up</a></p>
+
+                <!-- Add loading spinner CSS for signup button -->
+                <style>
+                  .btn-loading-spinner {
+                    display: inline-block;
+                    width: 18px;
+                    height: 18px;
+                    border: 2px solid #fff;
+                    border-top: 2px solid #0077cc;
+                    border-radius: 50%;
+                    animation: btn-spin 0.7s linear infinite;
+                    vertical-align: middle;
+                    margin-right: 6px;
+                  }
+                  @keyframes btn-spin {
+                    0% { transform: rotate(0deg);}
+                    100% { transform: rotate(360deg);}
+                  }
+                </style>
+                <script>
+                  // English: Add loading animation to signup button on submit
+                  // Hindi: Signup बटन पर फॉर्म सबमिट करते समय लोडिंग एनिमेशन दिखाएँ
+
+                  document.addEventListener('DOMContentLoaded', function() {
+                    var signupForm = document.getElementById('signupForm');
+                    var signupBtn = document.getElementById('signupBtn');
+                    if(signupForm && signupBtn) {
+                      signupForm.addEventListener('submit', function(e) {
+                        // Add spinner only if not already present
+                        if (!signupBtn.classList.contains('loading')) {
+                          signupBtn.classList.add('loading');
+                          signupBtn.disabled = true;
+                          signupBtn.innerHTML = '<span class="btn-loading-spinner"></span>Signing up...';
+                        }
+                      });
+                    }
+                  });
+                </script>
                 
             </div> 
 
