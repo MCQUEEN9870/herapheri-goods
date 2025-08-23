@@ -66,7 +66,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userPhone', mobileInput.value.trim());
                 showToast('Login successful!', 'success');
-                setTimeout(() => window.location.href = 'index', 800);
+                setTimeout(() => {
+                    const params = new URLSearchParams(window.location.search);
+                    const redir = params.get('redirect');
+                    let target = 'index';
+                    if (redir === 'register') target = 'register';
+                    window.location.href = target;
+                }, 800);
                 return;
             }
             showToast(data.message || 'Please use password or OTP login', 'error');
@@ -93,10 +99,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // 🔹 Signup Form Submission (direct signup, no OTP)
+    // 🔹 Signup Form Submission (direct signup, no OTP) with loading guard
     document.getElementById('signupForm').addEventListener('submit', async function (e) {
         e.preventDefault();
         const button = this.querySelector('button');
+        if (button.disabled) return; // Prevent multiple submissions
+        const originalHtml = button.innerHTML;
         const fullName = this.querySelector('input[name="fullName"]').value.trim();
         const contactNumber = this.querySelector('input[type="tel"]').value.trim();
         const emailValue = this.querySelector('input[type="email"]').value.trim();
@@ -124,6 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return; 
         }
         button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing up...';
         const payload = { fullName, contactNumber, password };
         if (emailValue) payload.email = emailValue;
         try {
@@ -149,6 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
             showToast(err.message || 'Signup failed', 'error');
         } finally {
             button.disabled = false;
+            button.innerHTML = originalHtml;
             // Reset captcha for security
             try { if (window.grecaptcha) grecaptcha.reset(window.SIGNUP_RECAPTCHA_ID); } catch(_) {}
         }
@@ -347,7 +357,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         localStorage.removeItem('userMembership');
                         let redirectPage = 'index';
                         if (type === 'Signup' && form.dataset.userExists === 'false') { redirectPage = 'register'; }
-                        setTimeout(() => { window.location.href = redirectPage; }, 1500);
+                        setTimeout(() => { 
+                            const params = new URLSearchParams(window.location.search);
+                            const redir = params.get('redirect');
+                            if (redir === 'register') redirectPage = 'register';
+                            window.location.href = redirectPage; 
+                        }, 1500);
                     }
                 } catch (error) {
                     button.disabled = false; button.textContent = 'Verify OTP';

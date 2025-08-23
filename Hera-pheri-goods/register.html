@@ -1,18 +1,23 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-V9X30VY879"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-V9X30VY879');
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register Your Vehicle - Hera Pheri Goods</title>
+    <script>
+        (function(){
+            try {
+                var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+                if (!isLoggedIn) {
+                    var isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+                    var loginPath = isLocal ? 'login.html' : 'login';
+                    // Hint to open signup and return to register after login
+                    window.location.replace(loginPath + '?signup=1&redirect=register');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -729,115 +734,8 @@
         </div>
     </div>
 
+    <script src="env.js"></script>
     <script src="register.js"></script>
-    <script>
-        // Add backend connection functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('vehicleRegistrationForm');
-            const celebrationOverlay = document.getElementById('celebrationOverlay');
-            
-            // Add form submission handler
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Check if form is valid (all required fields and 4 photos)
-                let isValid = true;
-                
-                // Validate vehicle type selection
-                const vehicleTypeInputs = document.querySelectorAll('input[name="vehicleType"]');
-                let vehicleTypeSelected = false;
-                vehicleTypeInputs.forEach(input => {
-                    if (input.checked) {
-                        vehicleTypeSelected = true;
-                    }
-                });
-                
-                if (!vehicleTypeSelected) {
-                    alert('Please select a vehicle type');
-                    isValid = false;
-                    return;
-                }
-                
-                // Validate photos (count must be 4)
-                const uploadCount = Object.values(uploadedPhotos).filter(photo => photo !== null).length;
-                if (uploadCount !== 4) {
-                    alert('Please upload all 4 required photos of your vehicle');
-                    isValid = false;
-                    return;
-                }
-                
-                if (!isValid) {
-                    return;
-                }
-                
-                // Create FormData object to send form data including files
-                const formData = new FormData();
-                
-                // Add text fields
-                formData.append('fullName', document.getElementById('name').value);
-                
-                // Get selected vehicle type
-                vehicleTypeInputs.forEach(input => {
-                    if (input.checked) {
-                        formData.append('vehicleType', input.value);
-                    }
-                });
-                
-                formData.append('contactNumber', document.getElementById('contactNo').value);
-                
-                // Only append WhatsApp number if it's not empty
-                const whatsappNumber = document.getElementById('whatsappNo').value;
-                if (whatsappNumber && whatsappNumber.trim() !== '') {
-                    formData.append('whatsappNumber', whatsappNumber);
-                }
-                
-                formData.append('vehiclePlateNumber', document.getElementById('vehicleNumber').value);
-                formData.append('state', document.getElementById('state').value);
-                formData.append('city', document.getElementById('city').value);
-                formData.append('pincode', document.getElementById('pincode').value);
-                
-                // Add images
-                Object.keys(uploadedPhotos).forEach(view => {
-                    if (uploadedPhotos[view]) {
-                        formData.append('vehicleImages', uploadedPhotos[view]);
-                    }
-                });
-                
-                // Send data to backend
-                const base = window.API_BASE_URL || 'http://localhost:8080';
-                fetch(`${base}/api/registration`, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Show celebration overlay
-                        celebrationOverlay.style.display = 'flex';
-                        
-                        // Clear form
-                        form.reset();
-                        
-                        // Clear photo uploads
-                        Object.keys(uploadedPhotos).forEach(view => {
-                            removePhoto(view);
-                        });
-                        
-                        // After 3 seconds, redirect to driver dashboard
-                        setTimeout(() => {
-                            window.location.href = '';
-                        }, 3000);
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
-                });
-            });
-        });
-    </script>
     
     <script>
         // Smart URL conversion - automatically adds .html for local development

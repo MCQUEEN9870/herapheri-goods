@@ -207,6 +207,18 @@
                 }
             });
         }
+        // Show signup form if signup param is present
+        (function(){
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('signup') || params.get('mode') === 'signup') {
+                const loginForm = document.querySelector('.login-form');
+                const signupForm = document.querySelector('.signup-form');
+                if (loginForm && signupForm) {
+                    loginForm.style.display = 'none';
+                    signupForm.style.display = 'block';
+                }
+            }
+        })();
     </script>
     
 </body>
