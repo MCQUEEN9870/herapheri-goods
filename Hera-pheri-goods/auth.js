@@ -104,16 +104,37 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!fullName || fullName.length < 2) { showToast('Please enter a valid name', 'error'); return; }
         if (!validateMobile(contactNumber)) { showToast('Please enter a valid 10-digit mobile number', 'error'); return; }
         if (!password || password.length < 4) { showToast('Please enter a valid password (min 4 chars)', 'error'); return; }
+        
         let captchaToken = '';
-        try { if (window.grecaptcha) captchaToken = grecaptcha.getResponse(window.SIGNUP_RECAPTCHA_ID); } catch(_) {}
-        if (!captchaToken) { showToast('Please complete reCAPTCHA', 'error'); return; }
+        let captchaRequired = true;
+        
+        // Check if we're in development mode (localhost) - disable captcha
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') {
+            captchaRequired = false;
+        }
+        
+        try { 
+            if (window.grecaptcha && captchaRequired) {
+                captchaToken = grecaptcha.getResponse(window.SIGNUP_RECAPTCHA_ID); 
+            }
+        } catch(_) {}
+        
+        if (captchaRequired && !captchaToken) { 
+            showToast('Please complete reCAPTCHA', 'error'); 
+            return; 
+        }
         button.disabled = true;
         const payload = { fullName, contactNumber, password };
         if (emailValue) payload.email = emailValue;
         try {
+            const headers = { 'Content-Type': 'application/json' };
+            if (captchaRequired && captchaToken) {
+                headers['X-Captcha-Token'] = captchaToken;
+            }
+            
             const res = await fetch(`${API_BASE_URL}/signup-direct`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Captcha-Token': captchaToken },
+                headers: headers,
                 body: JSON.stringify(payload)
             });
             const data = await handleApiResponse(res);
@@ -357,10 +378,40 @@ document.addEventListener('DOMContentLoaded', function () {
         toast.className = `toast ${type}`;
         toast.textContent = message;
         document.body.appendChild(toast);
-        toast.style.position = 'fixed'; toast.style.bottom = '20px'; toast.style.left = '50%'; toast.style.transform = 'translateX(-50%)';
-        toast.style.padding = '12px 24px'; toast.style.borderRadius = '8px'; toast.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
-        toast.style.color = 'white'; toast.style.zIndex = '1000';
-        setTimeout(() => { document.body.removeChild(toast); }, 3000);
+        toast.style.position = 'fixed'; 
+        toast.style.bottom = '20px'; 
+        toast.style.left = '50%'; 
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.padding = '12px 24px'; 
+        toast.style.borderRadius = '8px'; 
+        toast.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
+        toast.style.color = 'white'; 
+        toast.style.zIndex = '1000';
+        toast.style.fontWeight = '500';
+        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        toast.style.transition = 'all 0.3s ease';
+        
+        // Show toast immediately with animation
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(20px)';
+        
+        // Force reflow and then animate in
+        toast.offsetHeight;
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(-50%) translateY(0)';
+        
+        // Remove after shorter duration for better UX
+        setTimeout(() => { 
+            if (document.body.contains(toast)) {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(-20px)';
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
+                }, 300);
+            }
+        }, 2500);
     }
 
     function validateMobile(number) { number = number.trim(); return /^[6-9]\d{9}$/.test(number); }
@@ -416,82 +467,296 @@ document.addEventListener('DOMContentLoaded', function () {
         let wrongOtpCount = 0;
         let timerId = null;
         let timeLeft = 0;
+        let isOtpSent = false;
 
-        function openModal() { otpModal.style.display = 'flex'; }
-        function closeModal() { otpModal.style.display = 'none'; resetModalState(); }
-        function resetModalState(){ modalOtp.value=''; primaryBtn.textContent='Get OTP'; newPassBlock.style.display='none'; if(otpGroupEl){ otpGroupEl.style.display='none'; } stopTimer(); otpTimerEl.style.display='none'; try{grecaptcha.reset(window.OTPLOGIN_RECAPTCHA_ID);}catch(_){} }
-        function startTimer(seconds){ stopTimer(); timeLeft = seconds; otpTimerEl.style.display='inline'; otpTimerEl.textContent = formatTime(timeLeft); timerId = setInterval(()=>{ timeLeft--; otpTimerEl.textContent = formatTime(timeLeft); if(timeLeft<=0){ stopTimer(); primaryBtn.textContent='Resend OTP'; } }, 1000); }
-        function stopTimer(){ if(timerId){ clearInterval(timerId); timerId=null; } }
-        function formatTime(s){ const m=Math.floor(s/60), ss=s%60; return ` ${m}:${ss<10?'0':''}${ss}`; }
+        function openModal() { 
+            otpModal.style.display = 'flex'; 
+            // Pre-fill phone number from login form
+            if (mobileInputEl && mobileInputEl.value) {
+                modalPhone.value = mobileInputEl.value;
+            }
+        }
+        
+        function closeModal() { 
+            otpModal.style.display = 'none'; 
+            resetModalState(); 
+        }
+        
+        function resetModalState(){ 
+            modalOtp.value=''; 
+            primaryBtn.textContent='Get OTP'; 
+            primaryBtn.style.display='block';
+            primaryBtn.disabled = false;
+            newPassBlock.style.display='none'; 
+            if(otpGroupEl){ 
+                otpGroupEl.style.opacity = '0';
+                otpGroupEl.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    if (otpGroupEl) {
+                        otpGroupEl.style.display='none'; 
+                    }
+                }, 300);
+            } 
+            stopTimer(); 
+            otpTimerEl.style.display='none'; 
+            isOtpSent = false;
+            try{
+                grecaptcha.reset(window.OTPLOGIN_RECAPTCHA_ID);
+            }catch(_){}
+        }
+        
+        function startTimer(seconds){ 
+            stopTimer(); 
+            timeLeft = seconds; 
+            otpTimerEl.style.display='inline'; 
+            otpTimerEl.textContent = formatTime(timeLeft); 
+            timerId = setInterval(()=>{ 
+                timeLeft--; 
+                otpTimerEl.textContent = formatTime(timeLeft); 
+                if(timeLeft<=0){ 
+                    stopTimer(); 
+                    primaryBtn.textContent='Resend OTP'; 
+                    isOtpSent = false;
+                    showToast('OTP expired. Please request a new one.', 'error');
+                } 
+            }, 1000); 
+        }
+        
+        function stopTimer(){ 
+            if(timerId){ 
+                clearInterval(timerId); 
+                timerId=null; 
+            } 
+        }
+        
+        function formatTime(s){ 
+            const m=Math.floor(s/60), ss=s%60; 
+            return ` ${m}:${ss<10?'0':''}${ss}`; 
+        }
 
         closeBtn.addEventListener('click', closeModal);
         otpModal.addEventListener('click', (e)=>{ if(e.target===otpModal) closeModal(); });
+        
         forgotLink.addEventListener('click', function(e){
             e.preventDefault();
-            if (!validateMobile(mobileInputEl.value)) { showToast('Enter valid 10-digit mobile', 'error'); return; }
-            modalPhone.value = mobileInputEl.value; wrongOtpCount = 0; openModal();
+            if (!validateMobile(mobileInputEl.value)) { 
+                showToast('Enter valid 10-digit mobile', 'error'); 
+                return; 
+            }
+            modalPhone.value = mobileInputEl.value; 
+            wrongOtpCount = 0; 
+            openModal();
         });
 
         async function requestOtp() {
+            // Disable button immediately to prevent multiple clicks
+            primaryBtn.disabled = true;
+            primaryBtn.textContent = 'Sending...';
+            
             let captchaToken = '';
-            try { if (window.grecaptcha) captchaToken = grecaptcha.getResponse(window.OTPLOGIN_RECAPTCHA_ID); } catch(_) {}
-            if (!captchaToken) { showToast('Please complete reCAPTCHA before requesting OTP', 'error'); return false; }
-            const base = window.API_BASE_URL ? `${window.API_BASE_URL}/auth/forgot-init` : 'http://localhost:8080/auth/forgot-init';
-            const res = await fetch(base, { method:'POST', headers:{'Content-Type':'application/json','X-Captcha-Token':captchaToken}, body: JSON.stringify({ contactNumber: modalPhone.value.trim() })});
-            const data = await res.json().catch(()=>({}));
-            if (!res.ok) { showToast(data.message || 'Failed to send OTP', 'error'); return false; }
-            showToast('OTP sent. Enter OTP.', 'success');
-            primaryBtn.textContent = 'Verify OTP';
-            if (otpGroupEl) { otpGroupEl.style.display = 'block'; }
-            modalOtp.focus();
-            startTimer(60); // 1 minute timer
-            return true;
+            let captchaRequired = true;
+            
+            // Check if we're in development mode (localhost) - disable captcha
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') {
+                captchaRequired = false;
+            }
+            
+            try { 
+                if (window.grecaptcha && captchaRequired) {
+                    captchaToken = grecaptcha.getResponse(window.OTPLOGIN_RECAPTCHA_ID); 
+                }
+            }catch(_) {}
+            
+            if (captchaRequired && !captchaToken) { 
+                showToast('Please complete reCAPTCHA before requesting OTP', 'error'); 
+                primaryBtn.disabled = false;
+                primaryBtn.textContent = 'Get OTP';
+                return false; 
+            }
+            
+            try {
+                const base = window.API_BASE_URL ? `${window.API_BASE_URL}/auth/forgot-init` : 'http://localhost:8080/auth/forgot-init';
+                const res = await fetch(base, { 
+                    method:'POST', 
+                    headers:{
+                        'Content-Type':'application/json',
+                        'X-Captcha-Token':captchaToken
+                    }, 
+                    body: JSON.stringify({ contactNumber: modalPhone.value.trim() })
+                });
+                
+                const data = await res.json().catch(()=>({}));
+                
+                if (!res.ok) { 
+                    showToast(data.message || 'Failed to send OTP', 'error'); 
+                    primaryBtn.disabled = false;
+                    primaryBtn.textContent = 'Get OTP';
+                    return false; 
+                }
+                
+                // Show success message immediately
+                showToast('OTP sent successfully! Please check your phone.', 'success');
+                
+                // Show OTP field immediately with smooth animation
+                if (otpGroupEl) { 
+                    otpGroupEl.style.display = 'block';
+                    // Force reflow for smooth animation
+                    otpGroupEl.offsetHeight;
+                    otpGroupEl.style.opacity = '1';
+                    otpGroupEl.style.transform = 'translateY(0)';
+                }
+                
+                // Change button to Verify OTP
+                primaryBtn.textContent = 'Verify OTP';
+                primaryBtn.disabled = false;
+                
+                // Focus on OTP input
+                modalOtp.focus();
+                
+                // Start 1 minute timer
+                startTimer(60);
+                
+                isOtpSent = true;
+                return true;
+                
+            } catch (error) {
+                showToast('Failed to send OTP. Please try again.', 'error');
+                primaryBtn.disabled = false;
+                primaryBtn.textContent = 'Get OTP';
+                return false;
+            }
         }
 
         async function verifyOtp() {
             const otp = modalOtp.value.trim();
-            if (otp.length !== 4) { showToast('Enter 4-digit OTP', 'error'); return; }
-            const baseV = window.API_BASE_URL ? `${window.API_BASE_URL}/auth/forgot-verify` : 'http://localhost:8080/auth/forgot-verify';
-            const resV = await fetch(baseV, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ contactNumber: modalPhone.value.trim(), otp })});
-            const dV = await resV.json().catch(()=>({}));
-            if (!resV.ok) {
-                wrongOtpCount++;
-                showToast(dV.message || 'Invalid OTP', 'error');
-                // On wrong OTP: change to Resend, reset captcha, allow resend
-                primaryBtn.textContent = 'Resend OTP';
-                try { if (window.grecaptcha) grecaptcha.reset(window.OTPLOGIN_RECAPTCHA_ID); } catch(_){ }
-                stopTimer();
-                if (wrongOtpCount >= 3) {
-                    alert("You've entered an incorrect OTP multiple times.\nFor your safety, we've redirected you to the homepage. Please try again later or contact support if you're facing issues.\n\n🔒 Your security is our priority");
-                    window.location.href = 'index';
-                }
-                return;
+            if (otp.length !== 4) { 
+                showToast('Please enter 4-digit OTP', 'error'); 
+                return; 
             }
-            // Verified -> show new password form (do not auto-login)
-            stopTimer();
-            primaryBtn.style.display = 'none';
-            newPassBlock.style.display = 'block';
-            showToast('OTP verified. Set your new password.', 'success');
+            
+            // Disable button during verification
+            primaryBtn.disabled = true;
+            primaryBtn.textContent = 'Verifying...';
+            
+            try {
+                const baseV = window.API_BASE_URL ? `${window.API_BASE_URL}/auth/forgot-verify` : 'http://localhost:8080/auth/forgot-verify';
+                const resV = await fetch(baseV, { 
+                    method:'POST', 
+                    headers:{
+                        'Content-Type':'application/json'
+                    }, 
+                    body: JSON.stringify({ 
+                        contactNumber: modalPhone.value.trim(), 
+                        otp 
+                    })
+                });
+                
+                const dV = await resV.json().catch(()=>({}));
+                
+                if (!resV.ok) {
+                    wrongOtpCount++;
+                    showToast(dV.message || 'Invalid OTP. Please try again.', 'error');
+                    
+                    // On wrong OTP: change to Resend, reset captcha, allow resend
+                    primaryBtn.textContent = 'Resend OTP';
+                    primaryBtn.disabled = false;
+                    primaryBtn.style.display = 'block';
+                    
+                    try { 
+                        if (window.grecaptcha) grecaptcha.reset(window.OTPLOGIN_RECAPTCHA_ID); 
+                    }catch(_){ }
+                    
+                    stopTimer();
+                    isOtpSent = false;
+                    
+                    if (wrongOtpCount >= 3) {
+                        alert("You've entered an incorrect OTP multiple times.\nFor your safety, we've redirected you to the homepage. Please try again later or contact support if you're facing issues.\n\n🔒 Your security is our priority");
+                        window.location.href = 'index';
+                    }
+                    return;
+                }
+                
+                // OTP verified successfully -> show new password form
+                stopTimer();
+                primaryBtn.style.display = 'none';
+                newPassBlock.style.display = 'block';
+                showToast('OTP verified successfully! Please set your new password.', 'success');
+                
+            } catch (error) {
+                showToast('Verification failed. Please try again.', 'error');
+                primaryBtn.disabled = false;
+                primaryBtn.textContent = 'Verify OTP';
+            }
         }
 
         async function setNewPassword() {
             const otp = modalOtp.value.trim();
-            if (!otp || otp.length !== 4) { showToast('OTP missing/invalid', 'error'); return; }
-            if (newPass.value.length < 4 || newPass.value !== confirmPass.value) { showToast('Passwords must match and be at least 4 chars', 'error'); return; }
-            const base2 = window.API_BASE_URL ? `${window.API_BASE_URL}/auth/forgot-complete` : 'http://localhost:8080/auth/forgot-complete';
-            const res2 = await fetch(base2, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ contactNumber: modalPhone.value.trim(), otp, newPassword: newPass.value })});
-            const d2 = await res2.json().catch(()=>({}));
-            if (!res2.ok) { showToast(d2.message || 'Reset failed', 'error'); return; }
-            showToast('Password reset successful. Please login.', 'success');
-            // Redirect to login by closing modal
-            setTimeout(()=> { closeModal(); }, 600);
+            if (!otp || otp.length !== 4) { 
+                showToast('OTP missing/invalid', 'error'); 
+                return; 
+            }
+            
+            if (newPass.value.length < 4) {
+                showToast('Password must be at least 4 characters', 'error');
+                return;
+            }
+            
+            if (newPass.value !== confirmPass.value) { 
+                showToast('Passwords do not match', 'error'); 
+                return; 
+            }
+            
+            // Disable button during password reset
+            setNewPassBtn.disabled = true;
+            setNewPassBtn.textContent = 'Setting Password...';
+            
+            try {
+                const base2 = window.API_BASE_URL ? `${window.API_BASE_URL}/auth/forgot-complete` : 'http://localhost:8080/auth/forgot-complete';
+                const res2 = await fetch(base2, { 
+                    method:'POST', 
+                    headers:{
+                        'Content-Type':'application/json'
+                    }, 
+                    body: JSON.stringify({ 
+                        contactNumber: modalPhone.value.trim(), 
+                        otp, 
+                        newPassword: newPass.value 
+                    })
+                });
+                
+                const d2 = await res2.json().catch(()=>({}));
+                
+                if (!res2.ok) { 
+                    showToast(d2.message || 'Password reset failed', 'error'); 
+                    setNewPassBtn.disabled = false;
+                    setNewPassBtn.textContent = 'Set Password';
+                    return; 
+                }
+                
+                showToast('Password reset successful! Please login with your new password.', 'success');
+                
+                // Redirect to login by closing modal
+                setTimeout(()=> { 
+                    closeModal(); 
+                }, 1000);
+                
+            } catch (error) {
+                showToast('Password reset failed. Please try again.', 'error');
+                setNewPassBtn.disabled = false;
+                setNewPassBtn.textContent = 'Set Password';
+            }
         }
 
         primaryBtn.addEventListener('click', async function(){
             const label = primaryBtn.textContent.trim();
-            if (label === 'Get OTP' || label === 'Resend OTP') { await requestOtp(); }
-            else if (label === 'Verify OTP') { await verifyOtp(); }
+            if (label === 'Get OTP' || label === 'Resend OTP') { 
+                await requestOtp(); 
+            }
+            else if (label === 'Verify OTP') { 
+                await verifyOtp(); 
+            }
         });
+        
         setNewPassBtn.addEventListener('click', setNewPassword);
     }
 });
