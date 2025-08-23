@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const redir = params.get('redirect');
                     let target = 'index';
                     if (redir === 'register') target = 'register';
+                    if (redir === 'driver-dashboard') target = 'driver-dashboard';
                     window.location.href = target;
                 }, 800);
                 return;
@@ -361,6 +362,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             const params = new URLSearchParams(window.location.search);
                             const redir = params.get('redirect');
                             if (redir === 'register') redirectPage = 'register';
+                            if (redir === 'driver-dashboard') redirectPage = 'driver-dashboard';
                             window.location.href = redirectPage; 
                         }, 1500);
                     }

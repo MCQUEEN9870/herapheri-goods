@@ -5,8 +5,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Driver Dashboard - Herapheri Goods</title>
+    <script>
+        (function(){
+            try {
+                var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+                if (!isLoggedIn) {
+                    var isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+                    var loginPath = isLocal ? 'login.html' : 'login';
+                    window.location.replace(loginPath + '?redirect=driver-dashboard');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+ <!-- Favicons -->
+ <link rel="icon" type="image/png" href="attached_assets/favicon-32x32.png" sizes="32x32">
+ <link rel="icon" type="image/png" href="attached_assets/favicon-16x16.png" sizes="16x16">
+ <link rel="apple-touch-icon" href="attached_assets/apple-touch-icon.png">
+ <link rel="manifest" href="attached_assets/site.webmanifest">
+
+
     <style>
         /* Dashboard Specific Styles */
         body {
