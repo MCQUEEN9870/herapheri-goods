@@ -2614,7 +2614,7 @@ body {
 }
 
 .review-sidebar.active {
-    left: 0;
+    left: -9px;
 }
 
 .review-sidebar.hidden {
@@ -2801,7 +2801,7 @@ body {
     .review-sidebar {
         width: 286px;
         left: -290px;
-        top:300px;
+        top: 327px;
         
     }
     /* .review-toggle {
@@ -2830,7 +2830,7 @@ body {
     }
     
     .review-form textarea {
-        width: 100%;
+        width: 95%;
     }
 }
 
@@ -2965,10 +2965,10 @@ body {
 @media (max-width: 768px) {
     .share-drawer {
         left: -108px;
-        top: 500px;
+        top: 558px;
     }
     .share-toggle {
-        top: 10px;
+        top: 107px;
     }
     
     .social-icons a {
