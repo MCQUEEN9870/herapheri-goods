@@ -404,7 +404,15 @@ Best regards,
             window.open(gmailUrl, '_blank');
         }
     }
-            
+
+            document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS
+            AOS.init({
+                once: false,
+                mirror: true,
+                duration: 800,
+                offset: 100
+            });            
             const showMoreBtn = document.querySelector('.show-more-btn');
             const moreText = document.querySelector('.about-text-more');
 
