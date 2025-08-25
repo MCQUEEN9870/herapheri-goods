@@ -96,6 +96,12 @@
         <artifactId>guava</artifactId>
         <version>28.0-jre</version>
       </dependency>
+
+        <!-- Thymeleaf for server-side rendered templates -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
     </dependencies>
     
     <build>
