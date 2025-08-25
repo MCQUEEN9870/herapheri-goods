@@ -1284,7 +1284,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             contactDriverBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Contact via WhatsApp';
                             contactDriverBtn.onclick = function() {
                                 const cleanNumber = whatsappNumber.replace(/\D/g, '');
-                                window.open(`https://wa.me/${cleanNumber}`, '_blank');
+                                const message = encodeURIComponent("Hello, I got your contact from HerapheriGoods. I want to know more about your vehicle service.");
+                                window.open(`https://wa.me/${cleanNumber}?text=${message}`, '_blank');
                             };
                             contactDriverBtn.style.display = 'inline-block';
                         } else {
@@ -1932,7 +1933,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 contactDriverBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Contact via WhatsApp';
                 contactDriverBtn.onclick = function() {
                     const cleanNumber = whatsappNumber.replace(/\D/g, '');
-                    window.open(`https://wa.me/${cleanNumber}`, '_blank');
+                    const message = encodeURIComponent("Hello, I got your contact from HerapheriGoods. I want to know more about your vehicle service.");
+                    window.open(`https://wa.me/${cleanNumber}?text=${message}`, '_blank');
                 };
                 contactDriverBtn.style.display = 'inline-block';
             } else {
