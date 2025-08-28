@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,6 +53,43 @@ public class UserController {
         response.put("message", "User registered successfully!");
         
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Update user's email by contact number
+     */
+    @PutMapping("/{contactNumber}/email")
+    public ResponseEntity<?> updateUserEmail(@PathVariable String contactNumber, @RequestBody Map<String, Object> requestBody) {
+        try {
+            if (contactNumber == null || contactNumber.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Contact number is required"));
+            }
+            Object emailObj = requestBody.get("email");
+            String email = emailObj == null ? null : String.valueOf(emailObj).trim();
+            if (email == null || email.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Email is required"));
+            }
+            // Basic email validation
+            if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Please enter a valid email address"));
+            }
+
+            User user = userRepository.findByContactNumber(contactNumber);
+            if (user == null) {
+                return ResponseEntity.status(404).body(Map.of("success", false, "message", "User not found"));
+            }
+
+            user.setEmail(email);
+            userRepository.save(user);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Email updated successfully");
+            response.put("email", email);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Failed to update email: " + e.getMessage()));
+        }
     }
     
     /**

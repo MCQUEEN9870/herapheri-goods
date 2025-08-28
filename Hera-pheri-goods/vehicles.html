@@ -473,6 +473,35 @@
             object-fit: cover;
         }
 
+        /* Fullscreen Image Viewer */
+        .image-lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-lightbox.active { display: flex; }
+        .image-lightbox img {
+            max-width: 95vw;
+            max-height: 90vh;
+            border-radius: 6px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.4);
+        }
+        .image-lightbox .close-lightbox {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            font-size: 28px;
+            background: rgba(255,255,255,.15);
+            width: 40px; height: 40px; border-radius: 50%;
+            display:flex; align-items:center; justify-content:center;
+            cursor: pointer;
+        }
+
         .modal-header-overlay {
             position: absolute;
             bottom: 0;
@@ -1081,6 +1110,12 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <!-- Fullscreen Image Lightbox -->
+    <div class="image-lightbox" id="imageLightbox">
+        <span class="close-lightbox" id="closeLightbox">&times;</span>
+        <img id="lightboxImage" src="" alt="Vehicle Photo">
     </div>
 
    

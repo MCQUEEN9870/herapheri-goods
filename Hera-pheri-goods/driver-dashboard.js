@@ -179,6 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.querySelector('.user-name').innerHTML = 
                         `${userData.name} <span class="membership-badge" id="membershipBadge">${userData.membership}</span>`;
                     document.querySelector('.user-contact').textContent = userData.contact;
+                    try { setupEmailSettingsSection(); } catch (e) { console.warn('Email section init failed', e); }
                     
                     console.log("Mock user data loaded successfully:", userData);
                     
@@ -306,6 +307,117 @@ document.addEventListener('DOMContentLoaded', function() {
             // For Standard users: Show upgrade section, hide plans section
             premiumUpgradeSection.style.display = 'block';
             myPlansSection.style.display = 'none';
+        }
+    }
+
+    // Email Add/Change Section logic
+    function setupEmailSettingsSection() {
+        const section = document.getElementById('emailSettingsSection');
+        if (!section) return;
+        const emailInput = document.getElementById('emailInput');
+        const saveBtn = document.getElementById('saveEmailBtn');
+        const editBtn = document.getElementById('editEmailBtn');
+        const title = document.getElementById('emailSectionTitle');
+        const subtitle = document.getElementById('emailSectionSubtitle');
+        const statusMsg = document.getElementById('emailStatusMsg');
+
+        // Helper to re-fetch user data and refresh UI
+        async function refetchUser() {
+            const phone = localStorage.getItem('userPhone');
+            if (!phone) return;
+            try {
+                const res = await fetch(getApiUrl(`users/${phone}`));
+                if (!res.ok) return;
+                const data = await res.json();
+                userData.email = data?.user?.email || '';
+            } catch (e) {}
+        }
+
+        const currentEmail = (userData && userData.email) ? String(userData.email).trim() : '';
+        if (currentEmail) {
+            emailInput.value = currentEmail;
+            emailInput.disabled = true;
+            saveBtn.style.display = 'none';
+            editBtn.style.display = '';
+            title.textContent = 'Email on file';
+            subtitle.textContent = 'You can change your email anytime';
+            statusMsg.textContent = '';
+        } else {
+            emailInput.value = '';
+            emailInput.disabled = false;
+            saveBtn.style.display = '';
+            editBtn.style.display = 'none';
+            title.textContent = 'Add your email';
+            subtitle.textContent = 'Add an email to receive booking updates and notifications';
+            statusMsg.textContent = '';
+        }
+
+        if (editBtn) {
+            editBtn.onclick = () => {
+                emailInput.disabled = false;
+                emailInput.focus();
+                saveBtn.style.display = '';
+                editBtn.style.display = 'none';
+                statusMsg.textContent = '';
+            };
+        }
+
+        if (saveBtn) {
+            saveBtn.onclick = async () => {
+                const email = String(emailInput.value || '').trim();
+                statusMsg.style.color = '#666';
+                if (!email) {
+                    statusMsg.style.color = '#d32f2f';
+                    statusMsg.textContent = 'Please enter your email address';
+                    showToast('Please enter your email address', 'error');
+                    return;
+                }
+                const re = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
+                if (!re.test(email)) {
+                    statusMsg.style.color = '#d32f2f';
+                    statusMsg.textContent = 'Please enter a valid email address';
+                    showToast('Please enter a valid email address', 'error');
+                    return;
+                }
+
+                const phone = localStorage.getItem('userPhone');
+                if (!phone) {
+                    statusMsg.style.color = '#d32f2f';
+                    statusMsg.textContent = 'User not logged in. Please login again.';
+                    showToast('Please login again', 'error');
+                    return;
+                }
+
+                saveBtn.disabled = true;
+                saveBtn.innerText = 'Saving...';
+                try {
+                    const resp = await fetch(getApiUrl(`users/${phone}/email`), {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                    const data = await resp.json().catch(() => ({ success: false, message: 'Unexpected response' }));
+                    if (!resp.ok || !data.success) {
+                        throw new Error(data.message || `Failed with status ${resp.status}`);
+                    }
+                    userData.email = email;
+                    emailInput.value = email;
+                    emailInput.disabled = true;
+                    saveBtn.style.display = 'none';
+                    if (editBtn) editBtn.style.display = '';
+                    statusMsg.style.color = '#2e7d32';
+                    statusMsg.textContent = 'Email saved successfully';
+                    showToast('Email saved successfully', 'success');
+                    await refetchUser();
+                } catch (err) {
+                    statusMsg.style.color = '#d32f2f';
+                    statusMsg.textContent = String(err.message || err);
+                    showToast(String(err.message || 'Failed to save email'), 'error');
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.innerText = 'Save';
+                }
+            };
         }
     }
     
@@ -3523,6 +3635,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add active class to selected tab and button
         document.getElementById(tabId).classList.add('active');
+
+        // If settings tab is opened, (re)initialize email section UI
+        if (tabId === 'settingsTab') {
+            try { setupEmailSettingsSection(); } catch (e) { console.warn('Email section init on tab switch failed', e); }
+        }
         document.getElementById(tabId + 'Btn').classList.add('active');
     }
     

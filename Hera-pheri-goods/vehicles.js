@@ -17,6 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalGallery = document.getElementById('modalGallery');
     const modalInfo = document.getElementById('modalInfo');
     const contactDriverBtn = document.getElementById('contactDriverBtn');
+    const imageLightbox = document.getElementById('imageLightbox');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const closeLightbox = document.getElementById('closeLightbox');
     const favoriteBtn = document.getElementById('favoriteBtn');
     
     // API endpoint (replace with your actual backend URL)
@@ -1629,6 +1632,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 <img src="${images[0]}" alt="${vehicleName}" class="modal-header-image" onerror="this.src='attached_assets/images/default-vehicle.png'">
                 ${badgeHTML}
             `;
+            // Bind click to open full image
+            const headerImg = modalHeader.querySelector('.modal-header-image');
+            if (headerImg) {
+                headerImg.style.cursor = 'zoom-in';
+                headerImg.addEventListener('click', () => {
+                    lightboxImage.src = headerImg.src;
+                    imageLightbox.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            }
             
             // Populate gallery
             modalGallery.innerHTML = '';
@@ -1639,7 +1652,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Add click event to switch main image
                 galleryItem.addEventListener('click', function() {
-                    document.querySelector('.modal-header-image').src = image;
+                    const header = document.querySelector('.modal-header-image');
+                    if (header) header.src = image;
                 });
                 
                 modalGallery.appendChild(galleryItem);
@@ -2047,6 +2061,24 @@ document.addEventListener('DOMContentLoaded', function() {
             closeModal();
         }
     });
+
+    // Lightbox close handlers
+    if (closeLightbox) {
+        closeLightbox.addEventListener('click', () => {
+            imageLightbox.classList.remove('active');
+            lightboxImage.src = '';
+            document.body.style.overflow = 'auto';
+        });
+    }
+    if (imageLightbox) {
+        imageLightbox.addEventListener('click', (e) => {
+            if (e.target === imageLightbox) {
+                imageLightbox.classList.remove('active');
+                lightboxImage.src = '';
+                document.body.style.overflow = 'auto';
+            }
+        });
+    }
     
     // Function to close modal
     function closeModal() {

@@ -27,7 +27,7 @@
                 var ua = navigator.userAgent || '';
                 var isBot = /bot|crawl|spider|slurp|bingpreview|duckduckbot|baiduspider|yandex|semrush|ahrefs|facebookexternalhit|twitterbot|embedly|pinterest|linkedinbot/i.test(ua);
                 if(!isBot){
-                    window.location.replace([[${frontendUrl}]]);
+                    window.location.replace('[[${frontendUrl}]]');
                 }
             } catch(_){ }
         })();

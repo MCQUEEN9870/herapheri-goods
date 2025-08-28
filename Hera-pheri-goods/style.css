@@ -3815,7 +3815,7 @@ body {
 .modal-header {
     background-color: #FFA500;
     color: white;
-    padding: 6px;
+    padding: 3px;
     display: flex;
     justify-content: space-between;
     align-items: center;
