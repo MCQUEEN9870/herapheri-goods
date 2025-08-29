@@ -42,29 +42,30 @@ public class SeoService {
 
         if ("register".equalsIgnoreCase(intent) || path.startsWith("/register")) {
             String locStr = normalizedCity != null && !normalizedCity.isBlank() ? (" in " + normalizedCity) : "";
-            title = "Register Your " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType + " " : "Transport Vehicle ") + locStr + " | Herapheri Goods";
-            description = "Register your " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType : "transport vehicle")
-                    + (normalizedCity != null && !normalizedCity.isBlank() ? " in " + normalizedCity : "")
-                    + " for free on Herapheri Goods. Direct leads, no brokers.";
+            title = "Register Your " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType : "Transport Vehicle") + locStr + " | Herapheri Goods";
+            description = "List your " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType : "transport vehicle")
+                    + (normalizedCity != null && !normalizedCity.isBlank() ? " in " + normalizedCity : " at your pincode")
+                    + ". Free listing on Herapheri Goods. Get direct enquiries from nearby customers.";
             heading = "Register Your " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType : "Vehicle")
                     + (normalizedCity != null && !normalizedCity.isBlank() ? " in " + normalizedCity : "");
         } else if (path.startsWith("/vehicles") || "find".equalsIgnoreCase(intent)) {
             String typeStr = (normalizedType != null && !normalizedType.isBlank()) ? normalizedType : "Transport Vehicles";
             String cityStr = (normalizedCity != null && !normalizedCity.isBlank()) ? (" in " + normalizedCity) : "";
             title = "Find " + typeStr + cityStr + " | Herapheri Goods";
-            description = "Search " + typeStr.toLowerCase(Locale.ROOT) + cityStr + " on Herapheri Goods. Direct contact with owners, no brokers.";
+            description = "Find the best " + typeStr.toLowerCase(Locale.ROOT) + (normalizedCity != null && !normalizedCity.isBlank() ? " near you in " + normalizedCity : " near you")
+                    + ". Select your pincode and vehicle type to see verified owners with photos. No middlemen.";
             heading = "Find " + typeStr + cityStr;
         } else { // homepage and others
             if ((normalizedType != null && !normalizedType.isBlank()) || (normalizedCity != null && !normalizedCity.isBlank())) {
                 String cityStr2 = (normalizedCity != null && !normalizedCity.isBlank()) ? (" in " + normalizedCity) : "";
-                title = "Herapheri Goods" + cityStr2 + " | Finding " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType : "Transport Vehicles") + cityStr2;
-                description = "Don't worry, search " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType : "your vehicle")
-                        + (normalizedCity != null && !normalizedCity.isBlank() ? " at your pincode in " + normalizedCity : " at your pincode")
-                        + ". We've got multiple transport vehicles you can check.";
+                title = "Herapheri Goods" + cityStr2 + " | Find " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType : "Transport Vehicles") + cityStr2;
+                description = "Search by pincode to find " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType.toLowerCase(Locale.ROOT) : "transport vehicles")
+                        + (normalizedCity != null && !normalizedCity.isBlank() ? " near you in " + normalizedCity : " near you")
+                        + ". Contact owners directly. No brokers.";
                 heading = "Finding " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType : "Transport Vehicles") + cityStr2;
             } else {
                 title = "Herapheri Goods | Aapka Apna Transport Network";
-                description = "Find transport vehicles and register your own. Direct connection with owners, no middlemen.";
+                description = "Find nearby transport vehicles at your pincode and register your own vehicle for free. Contact owners directly. No middlemen.";
                 heading = "Herapheri Goods";
             }
         }
@@ -137,7 +138,7 @@ public class SeoService {
             .append("\"name\":\"Herapheri Goods\",")
             .append("\"url\":\"").append(escapeJson(baseUrl)).append("\",")
             .append("\"logo\":\"").append(escapeJson(baseUrl)).append("/attached_assets/images/new-logo.png\",")
-            .append("\"sameAs\":[\"https://herapherigoods.in\"]}")
+            .append("\"sameAs\":[\"https://www.herapherigoods.in\"]}")
             .toString();
 
         if (!isRegister) {

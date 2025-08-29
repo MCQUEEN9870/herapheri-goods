@@ -21,7 +21,7 @@ public class SeoController {
 
     private final SeoService seoService;
     
-    @Value("${app.frontendBaseUrl:https://herapherigoods.in}")
+    @Value("${app.frontendBaseUrl:https://www.herapherigoods.in}")
     private String frontendBaseUrl;
 
     public SeoController(SeoService seoService) {

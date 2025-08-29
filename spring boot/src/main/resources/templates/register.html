@@ -11,7 +11,10 @@
     <meta name="twitter:title" th:content="${title}" />
     <meta name="twitter:description" th:content="${description}" />
     <link rel="canonical" th:href="${canonicalUrl}" />
-    <link rel="icon" type="image/png" th:href="${frontendBase + '/attached_assets/favicon.ico/favicon-32x32.png'}" />
+    <link rel="icon" type="image/x-icon" th:href="${frontendBase} + '/favicon.ico'" />
+    <link rel="icon" type="image/png" th:href="${frontendBase} + '/favicon.ico/favicon-32x32.png'" sizes="32x32" />
+    <link rel="icon" type="image/png" th:href="${frontendBase} + '/favicon.ico/favicon-16x16.png'" sizes="16x16" />
+    <link rel="apple-touch-icon" th:href="${frontendBase} + '/favicon.ico/apple-touch-icon.png'" />
     <meta property="og:site_name" content="Herapheri Goods" />
     <meta property="og:image" th:content="${frontendBase + '/attached_assets/images/new-logo.png'}" />
 

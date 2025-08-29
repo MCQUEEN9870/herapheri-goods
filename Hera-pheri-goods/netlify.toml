@@ -7,6 +7,38 @@
 [build.processing.html]
   pretty_urls = true
 
+# Backend SSR rewrites for SEO discovery (place BEFORE static clean URLs)
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "https://api.herapherigoods.in/sitemap.xml"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/vehicles/*"
+  to = "https://api.herapherigoods.in/vehicles/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/register/*"
+  to = "https://api.herapherigoods.in/register/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/city/*"
+  to = "https://api.herapherigoods.in/city/:splat"
+  status = 200
+  force = true
+
+# Optional: route root to backend SSR as well
+[[redirects]]
+  from = "/"
+  to = "https://api.herapherigoods.in/"
+  status = 200
+  force = true
+
 # Clean URLs without .html extensions (200 = success, no redirect)
 [[redirects]]
   from = "/login"
