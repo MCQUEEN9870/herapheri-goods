@@ -137,7 +137,7 @@ public class SeoService {
             .append("\"name\":\"Herapheri Goods\",")
             .append("\"url\":\"").append(escapeJson(baseUrl)).append("\",")
             .append("\"logo\":\"").append(escapeJson(baseUrl)).append("/attached_assets/images/new-logo.png\",")
-            .append("\"sameAs\":[\"https://www.herapherigoods.in\"]}")
+            .append("\"sameAs\":[\"https://herapherigoods.in\"]}")
             .toString();
 
         if (!isRegister) {
