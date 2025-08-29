@@ -7,7 +7,32 @@
 [build.processing.html]
   pretty_urls = true
 
-# Backend SSR rewrites for SEO discovery (place BEFORE static clean URLs)
+# Prefer static pages for these exact paths (place BEFORE any SSR rewrites)
+[[redirects]]
+  from = "/register"
+  to = "/register.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/register/"
+  to = "/register.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/vehicles"
+  to = "/vehicles.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/vehicles/"
+  to = "/vehicles.html"
+  status = 200
+  force = true
+
+# Backend SSR rewrites for SEO discovery
 [[redirects]]
   from = "/sitemap.xml"
   to = "https://api.herapherigoods.in/sitemap.xml"
