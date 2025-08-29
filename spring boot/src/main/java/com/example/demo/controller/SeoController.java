@@ -28,7 +28,7 @@ public class SeoController {
         this.seoService = seoService;
     }
 
-    @GetMapping({"/","/index"})
+    @GetMapping({"/","/index","/index.html"})
     public String home(@RequestParam(name = "city", required = false) String city,
                        @RequestParam(name = "type", required = false) String type,
                        @RequestParam(name = "intent", required = false) String intent,
