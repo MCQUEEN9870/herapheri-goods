@@ -1287,7 +1287,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             contactDriverBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Contact via WhatsApp';
                             contactDriverBtn.onclick = function() {
                                 const cleanNumber = whatsappNumber.replace(/\D/g, '');
-                                const message = encodeURIComponent(
+                                const message = encodeURI(
                                     "Hello, I got your contact from HerapheriGoods. I want to know more about your vehicle service.\nनमस्ते, मुझे आपका संपर्क HerapheriGoods से मिला है। मैं आपकी वाहन सेवा के बारे में और जानना चाहता हूँ।"
                                 );
                                 window.open(`https://wa.me/${cleanNumber}?text=${message}`, '_blank');
@@ -1949,7 +1949,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 contactDriverBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Contact via WhatsApp';
                 contactDriverBtn.onclick = function() {
                     const cleanNumber = whatsappNumber.replace(/\D/g, '');
-                    const message = encodeURIComponent("Hello, I got your contact from HerapheriGoods. I want to know more about your vehicle service.\nनमस्ते, मुझे आपका संपर्क HerapheriGoods से मिला है। मैं आपकी वाहन सेवा के बारे में और जानना चाहता हूँ।");
+                    const message = encodeURI("Hello, I got your contact from HerapheriGoods. I want to know more about your vehicle service.\nनमस्ते, मुझे आपका संपर्क HerapheriGoods से मिला है। मैं आपकी वाहन सेवा के बारे में और जानना चाहता हूँ।");
                     window.open(`https://wa.me/${cleanNumber}?text=${message}`, '_blank');
                 };
                 contactDriverBtn.style.display = 'inline-block';
