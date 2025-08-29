@@ -32,12 +32,7 @@
   status = 200
   force = true
 
-# Optional: route root to backend SSR as well
-[[redirects]]
-  from = "/"
-  to = "https://api.herapherigoods.in/"
-  status = 200
-  force = true
+# Keep homepage on Netlify (do not proxy "/" to backend)
 
 # Clean URLs without .html extensions (200 = success, no redirect)
 [[redirects]]

@@ -37,7 +37,7 @@ public class SeoController {
         return buildAndRender("/", city, type, intent, request, model, "index");
     }
 
-    @GetMapping("/vehicles")
+    @GetMapping({"/vehicles","/vehicles.html"})
     public String vehicles(@RequestParam(name = "city", required = false) String city,
                            @RequestParam(name = "type", required = false) String type,
                            @RequestParam(name = "intent", required = false) String intent,
@@ -55,7 +55,7 @@ public class SeoController {
         return buildAndRender("/vehicles", city, type, "find", request, model, "vehicles");
     }
 
-    @GetMapping("/register")
+    @GetMapping({"/register","/register.html"})
     public String register(@RequestParam(name = "city", required = false) String city,
                            @RequestParam(name = "type", required = false) String type,
                            @RequestParam(name = "intent", required = false) String intent,
