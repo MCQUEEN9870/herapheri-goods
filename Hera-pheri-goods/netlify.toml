@@ -33,11 +33,7 @@
   force = true
 
 # Backend SSR rewrites for SEO discovery
-[[redirects]]
-  from = "/sitemap.xml"
-  to = "https://api.herapherigoods.in/sitemap.xml"
-  status = 200
-  force = true
+# Serve sitemap statically from Netlify (no proxy)
 
 [[redirects]]
   from = "/vehicles/*"
