@@ -57,7 +57,70 @@ document.addEventListener('DOMContentLoaded', function() {
     // Parse URL parameters to pre-fill the form
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('type')) {
-        vehicleTypeSelect.value = urlParams.get('type');
+        const vehicleType = urlParams.get('type');
+        console.log('Setting vehicle type from URL:', vehicleType);
+        
+        // Add a small delay to ensure dropdown is fully loaded
+        setTimeout(() => {
+            console.log('Available dropdown options:', Array.from(vehicleTypeSelect.options).map(opt => ({value: opt.value, text: opt.text})));
+            
+            // Try to set the value directly first
+            vehicleTypeSelect.value = vehicleType;
+            
+            // Check if the value was set correctly
+            if (vehicleTypeSelect.value !== vehicleType) {
+                console.warn('Vehicle type mismatch! URL has:', vehicleType, 'but dropdown shows:', vehicleTypeSelect.value);
+                console.log('Dropdown element:', vehicleTypeSelect);
+                console.log('Dropdown selectedIndex:', vehicleTypeSelect.selectedIndex);
+                
+                // Try alternative methods
+                console.log('Trying to find option by value...');
+                let found = false;
+                for (let i = 0; i < vehicleTypeSelect.options.length; i++) {
+                    const option = vehicleTypeSelect.options[i];
+                    console.log(`Option ${i}: value="${option.value}" text="${option.text}"`);
+                    if (option.value === vehicleType) {
+                        console.log('Found exact match by value!');
+                        vehicleTypeSelect.selectedIndex = i;
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found) {
+                    console.log('Trying to find option by text...');
+                    for (let i = 0; i < vehicleTypeSelect.options.length; i++) {
+                        const option = vehicleTypeSelect.options[i];
+                        if (option.text.toLowerCase().includes(vehicleType.toLowerCase().replace('&', ''))) {
+                            console.log('Found partial match by text!');
+                            vehicleTypeSelect.selectedIndex = i;
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                // Special handling for Packer&Movers
+                if (!found && vehicleType === 'Packer&Movers') {
+                    console.log('Special handling for Packer&Movers...');
+                    for (let i = 0; i < vehicleTypeSelect.options.length; i++) {
+                        const option = vehicleTypeSelect.options[i];
+                        if (option.value === 'Packer&Movers' || option.text.includes('Packers') || option.text.includes('Movers')) {
+                            console.log('Found Packer&Movers by special handling!');
+                            vehicleTypeSelect.selectedIndex = i;
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!found) {
+                    console.error('Could not find matching option for:', vehicleType);
+                }
+            } else {
+                console.log('Vehicle type set successfully:', vehicleTypeSelect.value);
+            }
+        }, 100);
     }
     if (urlParams.has('state')) {
         stateSelect.value = urlParams.get('state');
@@ -1287,7 +1350,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             contactDriverBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Contact via WhatsApp';
                             contactDriverBtn.onclick = function() {
                                 const cleanNumber = whatsappNumber.replace(/\D/g, '');
-                                const message = encodeURI(
+                                const message = encodeURIComponent(
                                     "Hello, I got your contact from HerapheriGoods. I want to know more about your vehicle service.\nनमस्ते, मुझे आपका संपर्क HerapheriGoods से मिला है। मैं आपकी वाहन सेवा के बारे में और जानना चाहता हूँ।"
                                 );
                                 window.open(`https://wa.me/${cleanNumber}?text=${message}`, '_blank');
@@ -1949,7 +2012,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 contactDriverBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Contact via WhatsApp';
                 contactDriverBtn.onclick = function() {
                     const cleanNumber = whatsappNumber.replace(/\D/g, '');
-                    const message = encodeURI("Hello, I got your contact from HerapheriGoods. I want to know more about your vehicle service.\nनमस्ते, मुझे आपका संपर्क HerapheriGoods से मिला है। मैं आपकी वाहन सेवा के बारे में और जानना चाहता हूँ।");
+                    const message = encodeURIComponent("Hello, I got your contact from HerapheriGoods. I want to know more about your vehicle service.\nनमस्ते, मुझे आपका संपर्क HerapheriGoods से मिला है। मैं आपकी वाहन सेवा के बारे में और जानना चाहता हूँ।");
                     window.open(`https://wa.me/${cleanNumber}?text=${message}`, '_blank');
                 };
                 contactDriverBtn.style.display = 'inline-block';
