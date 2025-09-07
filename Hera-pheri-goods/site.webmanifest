@@ -1,6 +1,6 @@
 {
   "name": "Herapheri Goods - Transport Vehicle Network",
-  "short_name": "Herapheri Goods",
+  "short_name": "HPG",
   "description": "Your one-stop platform for finding reliable transport vehicle owners. Connect directly with truck, mini truck, auto, e-rickshaw, JCB, crane owners and more - no middlemen, no extra charges!",
   "start_url": "/",
   "scope": "/",
@@ -89,6 +89,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "narrow"
+    }
+  ],
+  "splash_pages": [
+    {
+      "src": "/attached_assets/animation/starting.mp4",
+      "type": "video/mp4"
     }
   ],
   "related_applications": [],
