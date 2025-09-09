@@ -91,12 +91,7 @@
       "form_factor": "narrow"
     }
   ],
-  "splash_pages": [
-    {
-      "src": "/attached_assets/animation/starting.mp4",
-      "type": "video/mp4"
-    }
-  ],
+ 
   "related_applications": [],
   "prefer_related_applications": false
 }
