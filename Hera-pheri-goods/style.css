@@ -7,6 +7,7 @@ body {
   width: 100%;
   overflow-x: hidden;
 }
+html { overscroll-behavior-x: none; overflow-x: hidden; }
 
 /* Styling the navbar */
 .navbar {
@@ -108,9 +109,9 @@ body {
 
 /* Landing hero spacing balanced with fixed navbar */
 .hero-content-overlay { padding: 140px 24px 80px; }
-@media (max-width: 1200px) { .hero-content-overlay { padding: 120px 20px 70px; } }
+@media (max-width: 1200px) { .hero-content-overlay { padding: 110px 20px 70px; } }
 @media (max-width: 992px)  { .hero-content-overlay { padding: 100px 16px 60px; } }
-@media (max-width: 768px)  { .hero-content-overlay { padding: 90px 12px 50px; } }
+@media (max-width: 768px)  { .hero-content-overlay { padding: 80px 12px 50px; } }
 
 
 
@@ -495,20 +496,11 @@ body {
   margin-bottom: 40px;
 }
 
-.feature {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 15px 25px;
-  border-radius: 10px;
-  box-shadow: -5px 5px 0px #dcd91063;
-  transition: transform 0.3s ease;
-}
 
-.feature:hover {
+
+/* .feature:hover {
   transform: translateY(-5px);
-}
+} */
 
 .feature i {
   font-size: 1.5rem;
@@ -723,10 +715,6 @@ body {
     padding: 15px;
   }
   
-  .hero-btn {
-    padding: 12px 35px;
-    font-size: 1rem;
-  }
 }
 
 /* Responsive styles for registration section (Hidden) */
@@ -761,9 +749,9 @@ body {
   transition: transform 0.3s ease;
 }
 
-.feature:hover .feature-icon {
+/* .feature:hover .feature-icon {
         transform: scale(1.2);
-      }
+      } */
 
 /* Registration Video Styles */
  .registration-video {
@@ -806,15 +794,20 @@ body {
 }
 
 .hero-content-overlay {
-    position: relative;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: 2;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4); /* Dark overlay for better text readability */
+    background: rgba(0, 0, 0, 0.35);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 200px;
+    padding: 120px 24px 80px;
+    box-sizing: border-box;
 }
 
 .hero-container {
@@ -833,7 +826,7 @@ body {
 }
 
 .hero-content h1 {
-    font-size: 2.8rem;
+    font-size: 3.9rem;
     font-weight: 700;
     margin-bottom: 20px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
@@ -841,7 +834,7 @@ body {
 }
 
 .hero-content p {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     margin-bottom: 40px;
     line-height: 1.6;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
@@ -861,17 +854,17 @@ body {
     align-items: center;
     gap: 15px;
     background: rgba(255, 255, 255, 0.95);
-    padding: 20px 30px;
+    padding: 5px 15px;
     border-radius: 15px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
 }
 
-.hero-features .feature:hover {
+/* .hero-features .feature:hover {
     transform: translateY(-8px);
     box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
-}
+} */
 
 .hero-features .feature span {
     font-size: 1.1rem;
@@ -965,7 +958,8 @@ body {
     }
     
     .hero-features .feature {
-        padding: 12px 20px;
+        padding: 5px 15px;
+        width: 58%;
     }
 }
 
@@ -1008,10 +1002,10 @@ body {
 
 .find-vehicle-section {
     background: #cfcfcf;  /* Changed to #cfcfcf */
-    padding: 40px;
+    padding: 40px 40px;
     border-radius: 20px;
     box-shadow: 0 10px 12px #555555ad;
-    width: 90%;
+    width: 92%;
     max-width: 100%;
     margin-top: 28px;
     margin-left: 28px;
@@ -1024,6 +1018,9 @@ body {
     align-items: center;
     justify-content: space-between;
     /* gap: 40px; */
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .find-vehicle-content {
@@ -1155,7 +1152,7 @@ body {
     object-fit: contain;
     border-radius: 10px;
     box-shadow: none;
-    margin-left: 350px;
+    margin-left: 0;
 }
 
 .registration-img {
@@ -2623,8 +2620,8 @@ body {
 
 .review-toggle {
     position: absolute;
-    right: -40px;
-    top: 50%;
+    right: -42px;
+    top: 44%;
     transform: translateY(-50%);
     background: #FFA500;
     border: none;
@@ -2657,6 +2654,11 @@ body {
 
 .review-content {
     padding: 20px;
+}
+@media (max-width: 768px) {
+    .review-content {
+        padding: 13px;
+    }
 }
 
 .review-content h3 {
@@ -2822,13 +2824,16 @@ body {
     .g-recaptcha {
         transform: scale(0.85);
         transform-origin: left center;
-        width: 100% !important;
-        max-width: 260px;
+        width: 115% !important;
+        max-width: 305px;
         overflow: hidden;
     }
     
     .review-form textarea {
-        width: 95%;
+        width: 90%;
+    }
+    .submit-review {
+        width: 60%;
     }
 }
 
@@ -4295,7 +4300,7 @@ body {
   position: fixed;
   top: 0;
   right: -300px;
-  width: 300px;
+  width:  243px;
   height: 100vh;
   background: rgba(255, 255, 255, 0.10);
   backdrop-filter: blur(12px);
@@ -4369,8 +4374,7 @@ body {
 @media (max-width: 768px) {
   .glass-nav { justify-content: space-between; }
   .glass-nav .nav-links { display: none; }
-  .mobile-menu-btn { display: inline-flex; align-items: center; justify-content: center; margin-left: auto; order: 4; right: 94px;
-    position: relative;}
+  .mobile-menu-btn { display: inline-flex; align-items: center; justify-content: center; margin-left: auto; order: 4; right: -9px; position: relative; top: -60px ; }
   .glass-nav .navbar-logo { margin-left: 0; }
 }
 

@@ -116,12 +116,13 @@
         
         .contact-form-group input,
         .contact-form-group textarea {
-            width: 99%;
+            width: 100%;
             padding: 12px 15px;
             border: 1px solid #6666668a;
             border-radius: 5px;
             font-size: 16px;
             transition: border-color 0.3s;
+            box-sizing: border-box;
         }
         
         .contact-form-group input:focus,
@@ -315,6 +316,19 @@
                 padding: 8px 15px;
                 font-size: 14px;
             }
+            /* Make form comfortable on small screens */
+            .contact-form { 
+                max-width: 100%;
+                width: 100%;
+                padding: 20px;
+            }
+            .contact-form-group input,
+            .contact-form-group textarea { font-size: 16px; }
+        }
+
+        @media (max-width: 480px) {
+            .contact-section { padding: 24px 12px; }
+            .contact-form { padding: 16px; }
         }
     </style>
 </head>
