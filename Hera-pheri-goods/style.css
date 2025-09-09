@@ -112,10 +112,9 @@ body {
 @media (max-width: 992px)  { .hero-content-overlay { padding: 100px 16px 60px; } }
 @media (max-width: 768px)  { .hero-content-overlay { padding: 90px 12px 50px; } }
 
-/* Find Vehicle section responsive fixes */
-.find-vehicle-section { width: 91% !important; max-width: 1200px; margin: 28px auto !important; }
-.find-vehicle-container { margin: 0 auto !important; }
-.find-vehicle-video { margin-left: 0 !important; }
+
+
+
 
 /* Logo styles */
 .navbar-logo {
@@ -1009,23 +1008,22 @@ body {
 
 .find-vehicle-section {
     background: #cfcfcf;  /* Changed to #cfcfcf */
-    padding: 41px;
+    padding: 40px;
     border-radius: 20px;
     box-shadow: 0 10px 12px #555555ad;
-    width: 1435px;
+    width: 90%;
     max-width: 100%;
-    transform: translateY(30px);
-    opacity: 0;
     margin-top: 28px;
+    margin-left: 28px;
 }
 
 .find-vehicle-container {
-    max-width: 1200px;
-    margin: 0 -242px 0 40px;
+    /* max-width: 1200px; */
+    /* margin: 0 -242px 0 40px; */
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 40px;
+    /* gap: 40px; */
 }
 
 .find-vehicle-content {
@@ -1033,9 +1031,9 @@ body {
 }
 
 .find-vehicle-content h2 {
-    font-size: 2.5rem;
+    font-size: 2.9rem;
     color: #1a237e;
-    margin-bottom: 20px;
+    margin-bottom: 28px;
     font-weight: 700;
 }
 
@@ -4363,7 +4361,7 @@ body {
   height: 6px;
   border-radius: 50%;
   background: rgba(255,255,255,0.25);
-  transition: background 0.3s ease;
+  transition: background-color 0.3s ease;
 }
 
 .mobile-nav-item:hover::before { background: #FFA500; }
@@ -4371,7 +4369,7 @@ body {
 @media (max-width: 768px) {
   .glass-nav { justify-content: space-between; }
   .glass-nav .nav-links { display: none; }
-  .mobile-menu-btn { display: inline-flex; align-items: center; justify-content: center; margin-left: auto; order: 4; right: 84px;
+  .mobile-menu-btn { display: inline-flex; align-items: center; justify-content: center; margin-left: auto; order: 4; right: 94px;
     position: relative;}
   .glass-nav .navbar-logo { margin-left: 0; }
 }
