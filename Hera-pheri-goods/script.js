@@ -52,6 +52,56 @@ document.addEventListener('DOMContentLoaded', function() {
             dropdownContent.style.left = '';
         }
     });
+
+    // Mobile sidebar toggle
+    const mobileBtn = document.querySelector('.mobile-menu-btn');
+    const mobileSidebar = document.querySelector('.mobile-sidebar');
+    const mobileOverlay = document.querySelector('.mobile-overlay');
+    const mobileClose = document.querySelector('.mobile-close');
+
+    const closeMobileMenu = () => {
+        if (mobileSidebar) mobileSidebar.classList.remove('open');
+        if (mobileOverlay) mobileOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+        if (mobileBtn) mobileBtn.classList.remove('opened');
+    };
+
+    const openMobileMenu = () => {
+        if (mobileSidebar) mobileSidebar.classList.add('open');
+        if (mobileOverlay) mobileOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    };
+
+    if (mobileBtn && mobileSidebar && mobileOverlay) {
+        mobileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (mobileSidebar.classList.contains('open')) {
+                closeMobileMenu();
+            } else {
+                openMobileMenu();
+            }
+        });
+        mobileOverlay.addEventListener('click', closeMobileMenu);
+    }
+
+    if (mobileClose) {
+        mobileClose.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeMobileMenu();
+        });
+    }
+
+    // Close menu on link click and ensure profile link visibility syncs
+    document.querySelectorAll('.mobile-nav-item').forEach(link => {
+        link.addEventListener('click', closeMobileMenu);
+    });
+
+    // Sync My Profile visibility with login state for sidebar too
+    const sidebarProfileLink = document.getElementById('profileLink');
+    const isLoggedInSidebar = localStorage.getItem('isLoggedIn') === 'true' || !!localStorage.getItem('userContact');
+    if (sidebarProfileLink) {
+        sidebarProfileLink.style.display = isLoggedInSidebar ? 'inline-block' : 'none';
+    }
 });
 
 // Navigation Item Click Effects

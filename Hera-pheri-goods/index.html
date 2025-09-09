@@ -266,6 +266,10 @@
         <!-- Other Navigation Items -->
        
         <li>
+          <a href="posts" title="Post your vehicle need for free" class="nav-item"><span>Posts</span></a>
+        </li>
+
+        <li>
           <a href="contact-us" class="nav-item"><span>Contact Us</span></a>
         </li>
         
@@ -278,6 +282,15 @@
             </a>
         </li>
       </ul>
+
+      <!-- Mobile Hamburger Button -->
+      <button class="mobile-menu-btn menu" onclick="this.classList.toggle('opened');this.setAttribute('aria-expanded', this.classList.contains('opened'))" aria-label="Main Menu">
+        <svg width="40" height="40" viewBox="0 0 100 100">
+          <path class="line line1" d="M 20,29.000046 H 80.000231 C 80.000231,29.000046 94.498839,28.817352 94.532987,66.711331 94.543142,77.980673 90.966081,81.670246 85.259173,81.668997 79.552261,81.667751 75.000211,74.999942 75.000211,74.999942 L 25.000021,25.000058" />
+          <path class="line line2" d="M 20,50 H 80" />
+          <path class="line line3" d="M 20,70.999954 H 80.000231 C 80.000231,70.999954 94.498839,71.182648 94.532987,33.288669 94.543142,22.019327 90.966081,18.329754 85.259173,18.331003 79.552261,18.332249 75.000211,25.000058 75.000211,25.000058 L 25.000021,74.999942" />
+        </svg>
+      </button>
       
       <style>
         .profile-icon {
@@ -288,6 +301,20 @@
         }
       </style>
     </nav>
+    <!-- Mobile Sidebar Navigation -->
+    <div class="mobile-overlay"></div>
+    <aside class="mobile-sidebar">
+      <div class="mobile-sidebar-header">
+        <span class="brand-wordmark">Herapheri Goods</span>
+        <button class="mobile-close" aria-label="Close menu">&times;</button>
+      </div>
+      <ul class="mobile-nav-links">
+        <li><a href="vehicles" class="mobile-nav-item">Vehicle Type</a></li>
+        <li><a href="contact-us" class="mobile-nav-item">Contact Us</a></li>
+        <li><a href="posts" class="mobile-nav-item">Posts</a></li>
+        <li><a href="driver-dashboard" id="profileLink" class="mobile-nav-item">My Profile</a></li>
+      </ul>
+    </aside>
 <main>
     <!-- Main Content Block -->
     <div class="hero-section">
@@ -924,7 +951,7 @@ Best regards,
         // Smart URL conversion - automatically adds .html for local development
         if (typeof window.buildUrl === 'function') {
             // Convert all internal links to use smart URLs
-            const links = document.querySelectorAll('a[href^="vehicles"], a[href^="login"], a[href^="register"], a[href^="driver-dashboard"], a[href^="contact-us"], a[href^="privacy-policy"], a[href^="terms-and-condition"], a[href^="refer-and-refund-policy"]');
+            const links = document.querySelectorAll('a[href^="vehicles"], a[href^="login"], a[href^="register"], a[href^="driver-dashboard"], a[href^="contact-us"], a[href^="privacy-policy"], a[href^="terms-and-condition"], a[href^="refer-and-refund-policy"], a[href^="posts"]');
             links.forEach(link => {
                 const href = link.getAttribute('href');
                 if (href && !href.includes('?')) {
