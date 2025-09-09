@@ -4374,7 +4374,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 @media (max-width: 768px) {
   .glass-nav { justify-content: space-between; }
   .glass-nav .nav-links { display: none; }
-  .mobile-menu-btn { display: inline-flex; align-items: center; justify-content: center; margin-left: auto; order: 4; right: -9px; position: relative; top: -60px ; }
+  .mobile-menu-btn { display: inline-flex; align-items: center; justify-content: center; margin-left: auto; order: 4; right: 4px; position: relative; top: 0px ; }
   .glass-nav .navbar-logo { margin-left: 0; }
 }
 
