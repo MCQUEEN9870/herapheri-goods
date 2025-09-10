@@ -90,7 +90,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 }
 
 @media (max-width: 768px) {
-  .glass-nav { height: 64px; padding: 6px 14px; }
+  .glass-nav { height: 68px; padding: 6px 14px; }
   .glass-nav .navbar-logo img { max-width: 160px; }
   .glass-nav .nav-links { flex-direction: row; width: auto; margin: 0; }
   .glass-nav ul { gap: 12px; }
@@ -424,7 +424,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 @media (max-width: 768px) {
   .navbar {
     flex-direction: row;
-    padding: 6px 12px;
+    padding: 6px 0px;
     gap: 8px;
   }
 
