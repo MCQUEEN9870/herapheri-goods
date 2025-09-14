@@ -59,6 +59,10 @@ public class SupabaseService {
     @Value("${supabase.dl.bucket.name:dl}")
     private String dlBucketName;
 
+    // Dedicated bucket for post images (defaults to 'post-images', or falls back to main bucket)
+    @Value("${supabase.posts.bucket.name:post-images}")
+    private String postsBucketName;
+
     @Value("${supabase.max.retries:3}")
     private int maxRetries;
     
@@ -99,11 +103,91 @@ public class SupabaseService {
             ensureBucketExists(deletedProfilesBucketName);
             ensureBucketExists(rcBucketName);
             ensureBucketExists(dlBucketName);
+            // Ensure posts bucket
+            if (postsBucketName == null || postsBucketName.isBlank()) {
+                postsBucketName = bucketName;
+                System.out.println("Posts bucket not configured; defaulting to main bucket: " + postsBucketName);
+            } else {
+                ensureBucketExists(postsBucketName);
+                System.out.println("Using dedicated posts bucket: " + postsBucketName);
+            }
+            // Best-effort: ensure posts bucket is public so public URLs work
+            try { ensureBucketPublic(postsBucketName); } catch (Exception ignore) {}
             System.out.println("All required buckets exist or have been created.");
         } catch (IOException e) {
             System.err.println("Error ensuring buckets exist: " + e.getMessage());
             e.printStackTrace();
             // Continue initialization despite bucket creation failures
+        }
+    }
+
+    private void ensureBucketPublic(String bucket) throws IOException {
+        String json = "{\"public\": true}";
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), json);
+        Request request = new Request.Builder()
+                .url(supabaseUrl + "/storage/v1/bucket/" + bucket)
+                .addHeader("apikey", supabaseKey)
+                .addHeader("Authorization", "Bearer " + supabaseKey)
+                .addHeader("Content-Type", "application/json")
+                .patch(body)
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                System.out.println("Could not set bucket public via PATCH (status " + response.code() + ") — will try PUT");
+                Request requestPut = new Request.Builder()
+                        .url(supabaseUrl + "/storage/v1/bucket/" + bucket)
+                        .addHeader("apikey", supabaseKey)
+                        .addHeader("Authorization", "Bearer " + supabaseKey)
+                        .addHeader("Content-Type", "application/json")
+                        .put(body)
+                        .build();
+                try (Response resp2 = client.newCall(requestPut).execute()) {
+                    if (!resp2.isSuccessful()) {
+                        System.out.println("Bucket public update failed (status " + resp2.code() + "): " + resp2.message());
+                    }
+                }
+            }
+        }
+    }
+
+    /** Upload a single post image to posts bucket and return its public URL */
+    public String uploadPostImage(MultipartFile image) throws IOException {
+        if (image == null || image.isEmpty()) {
+            throw new IOException("Empty image file");
+        }
+        String targetBucket = (postsBucketName == null || postsBucketName.isBlank()) ? bucketName : postsBucketName;
+        String original = image.getOriginalFilename() != null ? image.getOriginalFilename() : "image.jpg";
+        String filename = "post_" + UUID.randomUUID() + "_" + original.replaceAll("[^A-Za-z0-9._-]", "_");
+        RequestBody fileBody = RequestBody.create(MediaType.parse(image.getContentType()), image.getBytes());
+        Request request = new Request.Builder()
+                .url(supabaseUrl + "/storage/v1/object/" + targetBucket + "/" + filename)
+                .addHeader("apikey", supabaseKey)
+                .addHeader("Authorization", "Bearer " + supabaseKey)
+                .put(fileBody)
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Post image upload failed: " + response.code() + " " + response.message());
+            }
+            return supabaseUrl + "/storage/v1/object/public/" + targetBucket + "/" + filename;
+        }
+    }
+
+    /** Delete a single post image by its public URL */
+    public void deletePostImageByUrl(String imageUrl) throws IOException {
+        if (imageUrl == null || imageUrl.isBlank()) return;
+        // Convert public URL to delete URL
+        String deleteUrl = imageUrl.replace("/storage/v1/object/public/", "/storage/v1/object/");
+        Request request = new Request.Builder()
+                .url(deleteUrl)
+                .addHeader("apikey", supabaseKey)
+                .addHeader("Authorization", "Bearer " + supabaseKey)
+                .delete()
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful() && response.code() != 404) {
+                throw new IOException("Failed to delete post image: " + response.code() + " " + response.message());
+            }
         }
     }
     
