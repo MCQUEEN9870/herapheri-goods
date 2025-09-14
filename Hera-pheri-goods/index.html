@@ -156,6 +156,59 @@
         margin-left: 0;
       }
       }
+
+      /* Footer layout: keep all columns (including Follow Us) in one row on wide screens */
+      @media (min-width: 1100px){
+        .footer .footer-content{
+          display: grid;
+          grid-template-columns: repeat(5, minmax(200px, 1fr));
+          align-items: start;
+          gap: 24px;
+        }
+      }
+
+      /* Footer: Follow Us - Modern Social Buttons */
+      .footer .social-follow {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .footer .btn-social {
+        width: 44px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+        transition: transform .2s ease, box-shadow .35s ease, border-color .35s ease, background .35s ease;
+        will-change: transform, box-shadow;
+      }
+      .footer .btn-social i { font-size: 18px; }
+      .footer .btn-social::before {
+        content: '';
+        position: absolute;
+        inset: -60% -40% auto -40%;
+        height: 180%;
+        background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.18), transparent 60%);
+        transform: translateY(60%) rotate(12deg);
+        transition: transform .6s ease;
+        pointer-events: none;
+      }
+      .footer .btn-social:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.28); }
+      .footer .btn-social:hover::before { transform: translateY(-10%) rotate(0deg); }
+      .footer .btn-social:active { transform: translateY(0); }
+      .footer .btn-social.yt { background: linear-gradient(180deg, rgba(255,0,0,1.00), rgba(255,0,0,0.06)); box-shadow: 0 8px 24px rgba(255,0,0,0.12); }
+      .footer .btn-social.wa { background: linear-gradient(180deg, rgba(37,211,102,1.00), rgba(37,211,102,0.06)); box-shadow: 0 8px 24px rgba(37,211,102,0.12); }
+      .footer .btn-social.fb { background: linear-gradient(180deg, rgba(24,119,242,1.00), rgba(24,119,242,0.06)); box-shadow: 0 8px 24px rgba(24,119,242,0.12); }
+      .footer .btn-social.yt:hover { box-shadow: 0 14px 36px rgba(255,0,0,0.22); }
+      .footer .btn-social.wa:hover { box-shadow: 0 14px 36px rgba(37,211,102,0.22); }
+      .footer .btn-social.fb:hover { box-shadow: 0 14px 36px rgba(24,119,242,0.22); }
       
     </style>
   </head>
@@ -847,6 +900,22 @@
                 <p>Transport Vehicle Listings <img src="attached_assets/animation/transport vehicle listing.gif" alt="Transport Listings" class="service-icon" style="display: inline;"></p>
                 <p>Direct Contact with Owners of Transport Vehicles <img src="attached_assets/animation/Direct Contact with Owners.gif" alt="Direct Contact" class="service-icon" style="display: inline;"></p>
                 <p>Search & Filter Options <img src="attached_assets/animation/Search & Filter Options.gif" alt="Search & Filter" class="service-icon" style="display: inline;"></p>
+        </div>
+
+        <!-- Follow Us Column (last in the row) -->
+        <div class="footer-column">
+            <h3>Follow Us</h3>
+            <div class="social-follow" aria-label="Follow Herapheri Goods on social media">
+                <a class="btn-social yt" href="https://youtube.com/@abhishekjha9870-k6b?si=K2n8Xz_COSUdRCg0" target="_blank" rel="noopener" title="YouTube">
+                    <i class="fab fa-youtube"></i>
+                </a>
+                <a class="btn-social wa" href="https://chat.whatsapp.com/LMUfgwk7qwOCh7p4Gxy0tc" target="_blank" rel="noopener" title="WhatsApp Group">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+                <a class="btn-social fb" href="https://www.facebook.com/share/1BQ8hdGTNo/" target="_blank" rel="noopener" title="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+            </div>
         </div>
     </div>
 

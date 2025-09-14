@@ -244,7 +244,7 @@
         cursor: pointer;
       }
       .composer-body { padding: 12px 14px 4px 14px; position: relative; }
-      .tooltip-pill { position: absolute; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); color: #ffe4a3; padding: 8px 10px; border-radius: 10px; font-size: 12px; transform: rotate(var(--rot, -2deg)); pointer-events: none; opacity: 0; transition: opacity .2s ease; z-index: 1000; }
+      .tooltip-pill { position: absolute;  color: #ffe4a3; padding: 8px 10px; border-radius: 10px; font-size: 12px; pointer-events: none; opacity: 0; transition: opacity .2s ease; z-index: 1000; }
 
       .composer-canvas {
         border-radius: 12px;
@@ -260,7 +260,7 @@
       }
       .composer-canvas[data-placeholder]:empty:before {
         content: attr(data-placeholder);
-        color: #a7b0bb;
+        color: #a7b0bb8a;
       }
       .toolbar {
         display: flex;
@@ -588,7 +588,7 @@
   </head>
   <body>
     <button class="back-btn" id="backBtn"><span class="back-pulse"></span><i class="fas fa-arrow-left"></i><span>Back</span></button>
-
+    
     <section class="posts-hero">
       <div class="glow"></div>
       <h1 class="hero-headline">The ultimate place for your<span class="changing-wrap"><span class="changing-word word-in" id="changingWord">Transport needs</span></span></h1>
@@ -602,7 +602,7 @@
         <button class="create-post-btn" id="openComposer" title= "Instead of searching vehicles, let them find you. Your post stays live for 24 hours and then vanishes—keeping the platform fresh and safe."><i class="fas fa-pen"></i>Create Post</button>
       </div>
     </section>
-
+    
     <!-- Post Detail Modal -->
     <div id="postModal" style="display:none; position:fixed; inset:0; z-index:1500; background:rgba(0,0,0,.6);">
       <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(92vw,760px); max-height:86vh; overflow:auto; background:#0f1116; border:1px solid rgba(255,255,255,.12); border-radius:12px;">
@@ -613,7 +613,7 @@
         <div id="modalBody" style="padding:14px; border-radius:0 0 12px 12px;"></div>
       </div>
     </div>
-
+    
     <section class="composer">
       <div class="composer-card" id="composerCard" aria-hidden="true">
         <div class="composer-inner">
@@ -622,7 +622,7 @@
             <button class="close-composer" id="closeComposer" aria-label="Close composer"><i class="fas fa-times"></i></button>
           </div>
           <div class="composer-body">
-            <div id="canvas" class="composer-canvas" contenteditable="true" data-placeholder="Write something... (e.g., Need Tata Ace from Agra→Mathura at 5 PM)"></div>
+            <div id="canvas" class="composer-canvas" contenteditable="true" data-placeholder="(e.g., Need Tata Ace from Agra→Mathura at 5 PM, contact no. 98XXXXXXXX, load 1.5Ton, Pincode 282001)"></div>
             <div class="toolbar">
               <div class="category-select">
                 <i class="fas fa-tags" aria-hidden="true"></i>
@@ -692,7 +692,7 @@
         <!-- Example posts (demo UI) -->
       </div>
     </section>
-
+    <script src="env.js"></script>
     <script>
       (function() {
         const backBtn = document.getElementById('backBtn');
@@ -871,9 +871,10 @@
         // Demo feed content
         const feedList = document.getElementById('feedList');
         // Backend API helpers
-        // Backend base URL from env.js (window.ENV.API_BASE) or window.API_BASE, else localhost when opened via file://
+        // Backend base URL from env.js or globals; prefer API_BASE_URL for consistency with other pages
         const API_BASE = (
           (window.ENV && window.ENV.API_BASE) ||
+          window.API_BASE_URL ||
           window.API_BASE ||
           (location.protocol === 'file:' ? 'http://localhost:8080' : '')
         ).replace(/\/$/, '');
