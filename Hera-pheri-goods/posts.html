@@ -870,12 +870,8 @@
 
         // Demo feed content
         const feedList = document.getElementById('feedList');
-        // Backend API helpers
-        // Force production to use the public API domain; keep local behavior for file:// and localhost
-        let API_BASE = (window.API_BASE_URL || window.API_BASE || (location.protocol === 'file:' ? 'http://localhost:8080' : '')).replace(/\/$/, '');
-        if (location.hostname && location.hostname.endsWith('herapherigoods.in')) {
-          API_BASE = 'https://api.herapherigoods.in';
-        }
+        // Backend API helpers: always use env.js computed base
+        const API_BASE = (window.API_BASE_URL || (location.protocol === 'file:' ? 'http://localhost:8080' : '')).replace(/\/$/, '');
         async function apiCreatePost(body) {
           const res = await fetch(API_BASE + '/api/posts', {
             method: 'POST',

@@ -30,19 +30,15 @@ function buildUrl(path) {
     return extension ? `${cleanPath}${extension}` : cleanPath;
 }
 
-// Set API base URL based on environment
+// Set API base URL based on environment (initial guess)
 let base;
 if (location.protocol === 'file:') {
-    // Local file system - use localhost backend
     base = 'http://localhost:8080';
 } else if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-    // Local development server
     base = 'http://localhost:8080';
 } else if (location.hostname.match(/^192\.168\.|^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\./)) {
-    // LAN development
     base = `http://${location.hostname}:8080`;
 } else {
-    // Live production
     base = 'https://api.herapherigoods.in';
 }
 
@@ -82,6 +78,40 @@ window.clearApiBase = function() {
 // Export the URL building function globally
 window.buildUrl = buildUrl;
 window.isLocalEnvironment = isLocalEnvironment;
+
+// Try to auto-detect a working API base on live by probing candidates
+(async function autoDetectApiBase() {
+    if (isLocalEnvironment()) return; // skip in local
+    const candidates = [
+        window.API_BASE_URL,
+        location.origin,
+        'https://www.herapherigoods.in',
+        'https://herapherigoods.in',
+        'https://api.herapherigoods.in'
+    ].filter(Boolean);
+
+    const check = async (b) => {
+        const controller = new AbortController();
+        const t = setTimeout(() => controller.abort(), 3000);
+        try {
+            const resp = await fetch(b.replace(/\/$/, '') + '/api/posts', { method: 'GET', headers: { 'Accept': 'application/json' }, signal: controller.signal });
+            clearTimeout(t);
+            return resp && resp.ok;
+        } catch (_e) {
+            clearTimeout(t);
+            return false;
+        }
+    };
+
+    for (const c of candidates) {
+        if (await check(c)) {
+            if (c !== window.API_BASE_URL) {
+                window.setApiBase(c);
+            }
+            break;
+        }
+    }
+})();
 
 
 
