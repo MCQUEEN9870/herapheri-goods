@@ -82,11 +82,9 @@ window.isLocalEnvironment = isLocalEnvironment;
 // Try to auto-detect a working API base on live by probing candidates
 (async function autoDetectApiBase() {
     if (isLocalEnvironment()) return; // skip in local
+    // Only consider API subdomain and current base; avoid picking the site origin by mistake
     const candidates = [
         window.API_BASE_URL,
-        location.origin,
-        'https://www.herapherigoods.in',
-        'https://herapherigoods.in',
         'https://api.herapherigoods.in'
     ].filter(Boolean);
 
@@ -96,7 +94,9 @@ window.isLocalEnvironment = isLocalEnvironment;
         try {
             const resp = await fetch(b.replace(/\/$/, '') + '/api/posts', { method: 'GET', headers: { 'Accept': 'application/json' }, signal: controller.signal });
             clearTimeout(t);
-            return resp && resp.ok;
+            const ct = resp.headers.get('content-type') || '';
+            // Accept only JSON responses; HTML means it's the frontend site, not the API
+            return resp && resp.ok && ct.includes('application/json');
         } catch (_e) {
             clearTimeout(t);
             return false;
