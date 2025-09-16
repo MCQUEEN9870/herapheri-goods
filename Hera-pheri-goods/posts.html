@@ -905,11 +905,33 @@
         (function presence(){
           const countEl = document.getElementById('liveCount');
           if (!countEl) return;
+          const LIVE_API = 'https://api.herapherigoods.in';
           const setCount = (n) => { countEl.textContent = '• ' + (Number.isFinite(n) ? n : 0); };
-          function startPolling(){
+
+          function getApiBaseNow(){
+            if (window.API_BASE_URL && String(window.API_BASE_URL).trim()) return String(window.API_BASE_URL).replace(/\/$/, '');
+            if (location.protocol === 'file:') return 'http://localhost:8080';
+            if (location.hostname && location.hostname.indexOf('herapherigoods.in') !== -1) return LIVE_API;
+            return '';
+          }
+
+          function withBase(cb){
+            let tries = 0;
+            (function wait(){
+              const base = getApiBaseNow();
+              if (base || tries > 20){
+                cb(base || LIVE_API);
+                return;
+              }
+              tries++;
+              setTimeout(wait, 150);
+            })();
+          }
+
+          function startPolling(base){
             async function poll(){
               try {
-                const r = await fetch(API_BASE + '/api/presence/count?page=posts');
+                const r = await fetch(base + '/api/presence/count?page=posts');
                 if (r.ok){
                   const d = await r.json();
                   setCount(d.count ?? 0);
@@ -918,13 +940,16 @@
             }
             poll();
           }
-          try {
-            const es = new EventSource(API_BASE + '/api/presence/stream?page=posts');
-            es.addEventListener('count', (e)=>{
-              try { setCount(JSON.parse(e.data).count); } catch { setCount(parseInt(e.data,10)||0); }
-            });
-            es.onerror = () => { try { es.close(); } catch(_){} startPolling(); };
-          } catch(_) { startPolling(); }
+
+          withBase(function(base){
+            try {
+              const es = new EventSource(base + '/api/presence/stream?page=posts');
+              es.addEventListener('count', (e)=>{
+                try { setCount(JSON.parse(e.data).count); } catch { setCount(parseInt(e.data,10)||0); }
+              });
+              es.onerror = () => { try { es.close(); } catch(_){} startPolling(base); };
+            } catch(_) { startPolling(base); }
+          });
         })();
         async function apiCreatePost(body) {
           const res = await fetch(API_BASE + '/api/posts', {
