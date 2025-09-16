@@ -686,7 +686,7 @@
           <div class="chip">General Query</div>
           <div class="chip">Local Updates</div>
         </div>
-        <div class="live-indicator"><span class="dot"></span> Live</div>
+        <div class="live-indicator"><span class="dot"></span> <span>Live</span> <span id="liveCount"></span></div>
       </div>
       <div class="card-list" id="feedList">
         <!-- Example posts (demo UI) -->
@@ -849,6 +849,32 @@
         const words = ['Transport needs', 'Vehicle Requirements', 'Services Offers', 'Promotions & ads', 'Local Updates & More'];
         let wordIdx = 0;
         let intervalId;
+        // Prevent layout jumps on mobile by reserving space for the tallest headline
+        // and the widest changing phrase at current viewport
+        function stabilizeHero() {
+          const headline = document.querySelector('.hero-headline');
+          const wrap = document.querySelector('.changing-wrap');
+          if (!headline || !wrap) return;
+          const probe = headline.cloneNode(true);
+          probe.style.position = 'absolute';
+          probe.style.visibility = 'hidden';
+          probe.style.pointerEvents = 'none';
+          probe.style.left = '-10000px';
+          // Match current width so wrapping behaves the same as visible headline
+          const currentWidth = Math.ceil(headline.getBoundingClientRect().width);
+          if (currentWidth > 0) probe.style.width = currentWidth + 'px';
+          document.body.appendChild(probe);
+          let maxHeight = 0;
+          const probeWord = probe.querySelector('.changing-word');
+          words.forEach(w => {
+            probeWord.textContent = w;
+            const rect = probe.getBoundingClientRect();
+            if (rect.height > maxHeight) maxHeight = rect.height;
+          });
+          document.body.removeChild(probe);
+          headline.style.minHeight = Math.ceil(maxHeight) + 'px';
+          // Do not lock width; allow wrapping so full text remains visible
+        }
         function cycleWord() {
           if (!changingWord) return;
           changingWord.classList.remove('word-in');
@@ -862,7 +888,10 @@
         }
         function startRotation() { intervalId = setInterval(cycleWord, 2000); }
         function stopRotation() { clearInterval(intervalId); }
+        stabilizeHero();
         startRotation();
+        let _heroRSzT;
+        window.addEventListener('resize', () => { clearTimeout(_heroRSzT); _heroRSzT = setTimeout(stabilizeHero, 150); });
         if (changingWord) {
           changingWord.addEventListener('mouseenter', stopRotation);
           changingWord.addEventListener('mouseleave', startRotation);
@@ -872,6 +901,31 @@
         const feedList = document.getElementById('feedList');
         // Backend API helpers: always use env.js computed base
         const API_BASE = (window.API_BASE_URL || (location.protocol === 'file:' ? 'http://localhost:8080' : '')).replace(/\/$/, '');
+        // --- Presence (Live users) ---
+        (function presence(){
+          const countEl = document.getElementById('liveCount');
+          if (!countEl) return;
+          const setCount = (n) => { countEl.textContent = '• ' + (Number.isFinite(n) ? n : 0); };
+          function startPolling(){
+            async function poll(){
+              try {
+                const r = await fetch(API_BASE + '/api/presence/count?page=posts');
+                if (r.ok){
+                  const d = await r.json();
+                  setCount(d.count ?? 0);
+                }
+              } catch(_){} finally { setTimeout(poll, 15000); }
+            }
+            poll();
+          }
+          try {
+            const es = new EventSource(API_BASE + '/api/presence/stream?page=posts');
+            es.addEventListener('count', (e)=>{
+              try { setCount(JSON.parse(e.data).count); } catch { setCount(parseInt(e.data,10)||0); }
+            });
+            es.onerror = () => { try { es.close(); } catch(_){} startPolling(); };
+          } catch(_) { startPolling(); }
+        })();
         async function apiCreatePost(body) {
           const res = await fetch(API_BASE + '/api/posts', {
             method: 'POST',
