@@ -4,7 +4,9 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +25,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/posts")
+@CrossOrigin(origins = {"https://herapherigoods.in", "https://www.herapherigoods.in", "https://api.herapherigoods.in", "http://localhost:8080", "http://localhost:5500", "http://127.0.0.1:5500"})
 public class PostController {
 
     private final PostService postService;
@@ -51,6 +54,19 @@ public class PostController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime updatedAfter
     ) {
         return ResponseEntity.ok(postService.list(category, updatedAfter));
+    }
+
+    // Presence aliases under /api/posts to avoid proxy-path 404s
+    @GetMapping(path = "/presence/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public org.springframework.web.servlet.mvc.method.annotation.SseEmitter presenceStream(@RequestParam(name = "page", defaultValue = "posts") String page,
+            com.example.demo.service.PresenceService presenceService) {
+        return presenceService.add(page);
+    }
+
+    @GetMapping(path = "/presence/count")
+    public java.util.Map<String, Object> presenceCount(@RequestParam(name = "page", defaultValue = "posts") String page,
+            com.example.demo.service.PresenceService presenceService) {
+        return java.util.Map.of("page", page, "count", presenceService.count(page));
     }
 
     // Upload a single post image, returns { url: "..." }
