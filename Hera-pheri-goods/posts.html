@@ -928,14 +928,28 @@
             })();
           }
 
+          async function tryJson(url){
+            const r = await fetch(url, { method: 'GET' });
+            if (!r.ok) throw new Error(String(r.status));
+            return r.json();
+          }
+
+          function pickPresenceBase(base){
+            return {
+              stream: [base + '/api/presence/stream?page=posts', base + '/api/posts/presence/stream?page=posts'],
+              count: [base + '/api/presence/count?page=posts', base + '/api/posts/presence/count?page=posts']
+            };
+          }
+
           function startPolling(base){
             async function poll(){
               try {
-                const r = await fetch(base + '/api/presence/count?page=posts');
-                if (r.ok){
-                  const d = await r.json();
-                  setCount(d.count ?? 0);
+                const urls = pickPresenceBase(base).count;
+                let d = null;
+                for (let i = 0; i < urls.length && d === null; i++) {
+                  try { d = await tryJson(urls[i]); } catch(_) {}
                 }
+                if (d) setCount(d.count ?? 0);
               } catch(_){} finally { setTimeout(poll, 15000); }
             }
             poll();
@@ -943,11 +957,24 @@
 
           withBase(function(base){
             try {
-              const es = new EventSource(base + '/api/presence/stream?page=posts');
+              const urls = pickPresenceBase(base).stream;
+              let es = new EventSource(urls[0]);
+              let switched = false;
+              const switchToFallback = () => {
+                if (switched) return; switched = true;
+                try { es && es.close(); } catch(_){ }
+                try {
+                  es = new EventSource(urls[1]);
+                  es.addEventListener('count', (e)=>{
+                    try { setCount(JSON.parse(e.data).count); } catch { setCount(parseInt(e.data,10)||0); }
+                  });
+                  es.onerror = () => { try { es.close(); } catch(_){} startPolling(base); };
+                } catch(_){ startPolling(base); }
+              };
               es.addEventListener('count', (e)=>{
                 try { setCount(JSON.parse(e.data).count); } catch { setCount(parseInt(e.data,10)||0); }
               });
-              es.onerror = () => { try { es.close(); } catch(_){} startPolling(base); };
+              es.onerror = () => switchToFallback();
             } catch(_) { startPolling(base); }
           });
         })();

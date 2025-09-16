@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.example.demo.service.PresenceService;
 
 @RestController
-@RequestMapping("/api/presence")
+@RequestMapping({"/api/presence", "/api/posts/presence"})
 @CrossOrigin(origins = {"https://herapherigoods.in", "https://www.herapherigoods.in", "https://api.herapherigoods.in", "http://localhost:8080", "http://localhost:5500", "http://127.0.0.1:5500"})
 public class PresenceController {
 
